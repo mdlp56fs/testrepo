@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+# Le node a besoin de SSH pour la connexion et Python pour exécuter les modules Ansible
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    sudo \
+    python3 \
+    iputils-ping
+
+# Création du même utilisateur pour faciliter la connexion
+RUN useradd -m -s /bin/bash ansible_user && \
+    echo "ansible_user:password" | chpasswd && \
+    usermod -aG sudo ansible_user
+
+# Préparation du dossier SSH
+RUN mkdir /var/run/sshd
+
+# Autoriser sudo sans mot de passe pour les installations distantes
+RUN echo "ansible_user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
+

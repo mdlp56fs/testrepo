@@ -1,0 +1,29 @@
+# Utilisation d'une base Ubuntu légère
+FROM ubuntu:22.04
+
+# Installation d'Ansible, SSH et des outils réseaux
+RUN apt-get update && apt-get install -y \
+    ansible \
+    openssh-server \
+    openssh-client \
+    sudo \
+    iputils-ping \
+    vim \
+    python3
+
+# Configuration de l'utilisateur pour Ansible
+RUN useradd -m -s /bin/bash ansible_user && \
+    echo "ansible_user:password" | chpasswd && \
+    usermod -aG sudo ansible_user
+
+# Préparation du dossier SSH
+RUN mkdir /var/run/sshd
+
+# On autorise l'utilisateur à utiliser sudo sans mot de passe (pratique pour l'automatisation)
+RUN echo "ansible_user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+EXPOSE 22
+
+# Démarrage du service SSH
+CMD ["/usr/sbin/sshd", "-D"]
+

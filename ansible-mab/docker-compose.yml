@@ -1,0 +1,34 @@
+
+version: '3'
+services:
+  # Le serveur qui possède Ansible
+  manager:
+    build: 
+      context: .
+      dockerfile: Dockerfile_ansible
+    container_name: ansible_manager
+    volumes:
+      - ./playbooks:/home/ansible_user/playbooks
+    networks:
+      - ansible_net
+
+  # Premier serveur cible
+  node1:
+    build:
+      context: .
+      dockerfile: Dockerfile_node
+    container_name: node1
+    networks:
+      - ansible_net
+
+  # Deuxième serveur cible
+  node2:
+    build:
+      context: .
+      dockerfile: Dockerfile_node
+    networks:
+      - ansible_net
+
+networks:
+  ansible_net:
+
